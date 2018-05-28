@@ -16,15 +16,12 @@
 </template>
 
 <script>
-import {
-  createFromAlgoliaCredentials,
-  createFromSerialized,
-  FACET_OR
-} from 'vue-instantsearch'
 
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 
-let store1
+const setSearchStore = (store, route) => {
+  return store.dispatch(`getSearchStore`, route)
+}
 
 export default {
   computed: {
@@ -32,29 +29,17 @@ export default {
       searchStore: 'searchStore'
     })
   },
-  asyncData({store, route}) {
-    store1 = createFromAlgoliaCredentials(
-      'latency',
-      '6be0576ff61c053d5f9a3225e2a90f76'
-    )
-    store1.indexName = 'ikea'
-    store1.query = route.params.query ? route.params.query : ''
-    store1.addFacet('colors', FACET_OR)
-    store1.highlightPreTag = '<mark>'
-    store1.highlightPostTag = '</mark>'
-    store1.start()
-    store1.refresh()
-    return store1.waitUntilInSync().then(() => {
-      store.dispatch(`searchStore`, store1.serialize())
-    })
-  },
-  beforeMount() {
-    if (!window.__INITIAL_STATE__) {
-      throw new Error('Not state was found.')
+  asyncData: setSearchStore,
+  methods: {
+    ...mapActions({
+      getSearchStore: 'getSearchStore'
+    }),
+    loadSearchData() {
+      return this.setSearchStore(this.$store, this.$route)
     }
-    this.searchStore = createFromSerialized(
-      window.__INITIAL_STATE__.searchStore
-    )
+  },
+  created() {
+    this.loadSearchData()
   },
   watch: {
     '$route'() {

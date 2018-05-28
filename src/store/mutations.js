@@ -2,7 +2,8 @@ export default {
   setPosts: (state, posts) => {
     state.posts = posts
   },
-  searchStore: (state, results) => {
+  setSearchStore: (state, results) => {
+    console.log(results)
     state.searchStore = results
   }
 }
