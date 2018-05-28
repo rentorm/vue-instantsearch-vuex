@@ -43,6 +43,11 @@ export default context => {
                 context,
                 route: router.currentRoute
               })
+            } else if (Component.asyncData) {
+              return Component.asyncData({
+                store,
+                route: router.currentRoute
+              })
             }
             return undefined
           })
