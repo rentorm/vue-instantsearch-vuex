@@ -2,6 +2,7 @@ import http from 'axios'
 import { BASE_URL } from '@root/webconfig'
 import {
   createFromAlgoliaCredentials,
+  createFromSerialized,
   FACET_OR
 } from 'vue-instantsearch'
 
@@ -17,7 +18,7 @@ export default {
       console.log(error)
     })
   },
-  getSearchStore: ({commit}, route) => {
+  getSearchStore: ({commit, state}, route) => {
     let store1
     store1 = createFromAlgoliaCredentials(
       'latency',
@@ -31,7 +32,7 @@ export default {
     store1.start()
     store1.refresh()
     return store1.waitUntilInSync().then(() => {
-      commit('setSearchStore', store1.serialize())
+      commit('setSearchStore', createFromSerialized(store1.serialize()))
     }).catch((error) => {
       console.log(error)
     })

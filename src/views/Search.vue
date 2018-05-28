@@ -17,29 +17,19 @@
 
 <script>
 
-import { mapGetters, mapActions } from 'vuex'
-
-const setSearchStore = (store, route) => {
-  return store.dispatch(`getSearchStore`, route)
-}
-
 export default {
+  asyncData({store, route}) {
+    return store.dispatch(`getSearchStore`, route)
+  },
   computed: {
-    ...mapGetters({
-      searchStore: 'searchStore'
-    })
-  },
-  asyncData: setSearchStore,
-  methods: {
-    ...mapActions({
-      getSearchStore: 'getSearchStore'
-    }),
-    loadSearchData() {
-      return this.setSearchStore(this.$store, this.$route)
+    searchStore: {
+      get() {
+        return this.$store.state.searchStore
+      },
+      set(value) {
+        this.$store.commit('setSearchStore', value)
+      }
     }
-  },
-  created() {
-    this.loadSearchData()
   },
   watch: {
     '$route'() {
@@ -49,12 +39,24 @@ export default {
     },
     'searchStore.query'(to) {
       if (to.length === 0) {
-        this.$router.push({ name: 'map' })
+        this.$router.push({ name: 'search' })
       } else {
-        this.$router.push({ name: 'mapSearch', params: { query: to } })
+        this.$router.push({ name: 'searchQuery', params: { query: to } })
       }
     }
   }
 
 }
 </script>
+
+<style lang="stylus" scoped>
+  h3
+    margin 20px 0 15px
+
+  .posts
+    max-width 600px
+
+  .post
+    padding-bottom 15px
+    border-bottom 1px solid #eee
+</style>
