@@ -22,17 +22,15 @@ import {
   FACET_OR
 } from 'vue-instantsearch'
 
-import { mapGetters } from 'vuex'
-
 let store1
 
 export default {
-  computed: {
-    ...mapGetters({
-      searchStore: 'searchStore'
-    })
+  data() {
+    return {
+      searchStore: store1
+    }
   },
-  asyncData({store, route}) {
+  prefetch({context, route}) {
     store1 = createFromAlgoliaCredentials(
       'latency',
       '6be0576ff61c053d5f9a3225e2a90f76'
@@ -45,7 +43,9 @@ export default {
     store1.start()
     store1.refresh()
     return store1.waitUntilInSync().then(() => {
-      store.dispatch(`searchStore`, store1.serialize())
+      context.state = {
+        searchStore: store1.serialize()
+      }
     })
   },
   beforeMount() {
@@ -57,16 +57,16 @@ export default {
     )
   },
   watch: {
-    '$route'() {
+    $route() {
       this.searchStore.query = this.$route.params.query
         ? this.$route.params.query
         : ''
     },
     'searchStore.query'(to) {
       if (to.length === 0) {
-        this.$router.push({ name: 'map' })
+        this.$router.push({ name: 'search' })
       } else {
-        this.$router.push({ name: 'mapSearch', params: { query: to } })
+        this.$router.push({ name: 'searchQuery', params: { query: to } })
       }
     }
   }

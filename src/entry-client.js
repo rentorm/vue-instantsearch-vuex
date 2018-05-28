@@ -16,10 +16,15 @@ document.body.appendChild(bar.$el)
 // a global mixin that calls `asyncData` when a route component's params change
 Vue.mixin({
   beforeRouteUpdate(to, from, next) {
-    const { asyncData } = this.$options
+    const { asyncData, prefetch } = this.$options
     if (asyncData) {
       asyncData({
         store: this.$store,
+        route: to
+      }).then(next).catch(next)
+    } else if (prefetch) {
+      prefetch({
+        context: this.state,
         route: to
       }).then(next).catch(next)
     } else {
